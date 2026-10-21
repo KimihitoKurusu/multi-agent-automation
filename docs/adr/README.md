@@ -292,7 +292,7 @@ The decision log begins with the following planned baseline records:
 
 | ADR | Decision | Status |
 | --- | --- | --- |
-| ADR-0001 | Primary language and runtime | Planned |
+| ADR-0001 | Primary language and runtime | Accepted |
 | ADR-0002 | Monorepo and package management | Planned |
 | ADR-0003 | Multi-agent hierarchy | Planned |
 | ADR-0004 | Git branching and promotion | Planned |
