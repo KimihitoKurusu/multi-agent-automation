@@ -229,7 +229,7 @@ The commit body remains compatible with optional Conventional Commit bodies and 
 
 For a substantive multi-change commit:
 
-- use `- ` unordered bullets,
+- use `-` unordered bullets,
 - keep each bullet concise,
 - describe an observable implementation outcome, contract, validation, or behavior,
 - avoid redundant file inventories,
