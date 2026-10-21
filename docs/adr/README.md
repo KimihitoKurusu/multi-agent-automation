@@ -297,7 +297,7 @@ The decision log begins with the following planned baseline records:
 | ADR-0003 | Multi-agent hierarchy | Accepted |
 | ADR-0004 | Git branching and promotion | Accepted |
 | ADR-0005 | Policy enforcement and defense in depth | Accepted |
-| ADR-0006 | Shared browser control | Planned |
+| ADR-0006 | Shared browser control | Accepted |
 
 `Planned` in this index means the ADR file has not yet completed creation and acceptance. `Planned` is not an ADR document status.
 
