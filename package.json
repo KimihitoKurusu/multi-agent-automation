@@ -1,0 +1,18 @@
+{
+  "name": "multi-agent-automation",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Multi-agent platform for governed web research, browser automation and human-in-the-loop workflows.",
+  "type": "module",
+  "engines": {
+    "node": ">=24 <25"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "clean": "node -e \"console.log('Nothing to clean yet')\""
+  },
+  "devDependencies": {
+    "@types/node": "^24",
+    "typescript": "^5.9"
+  }
+}
