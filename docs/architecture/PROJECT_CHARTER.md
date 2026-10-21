@@ -344,9 +344,9 @@ main
   ^
 test
   ^
-lider_<feature>
+<feature>/common
   ^
-dev_<feature>_<task>
+<feature>/common
 
 ```
 
@@ -354,16 +354,20 @@ dev_<feature>_<task>
 
 *test* is the Architect-governed integration branch.
 
+*common* branches inside every *feature* namespace are the Team Leader-governed
+integration branches for each *feature* respectively until it is completed,
+tested and ready to deliver to Architect.
+
 Each Team Leader uses a branch following the convention:
 
 ```text
-lider_<feature>
+<feature>/common
 ```
 
 Each Developer uses a branch following the convention:
 
 ```text
-dev_<feature>_<task>
+<feature>/commonw
 ```
 
 Direct Developer integration into *test* is prohibited.

@@ -104,9 +104,9 @@ main
   ^
 test
   ^
-lider_<feature>
+<feature>/common
   ^
-dev_<feature>_<task>
+<feature>/<task>
 ```
 
 ### `main`
@@ -126,7 +126,7 @@ Feature work must not bypass its required review chain before reaching `test`.
 A Team Leader feature branch follows:
 
 ```text
-lider_<feature>
+<feature>/common
 ```
 
 It is used to integrate Developer work that the Team Leader has approved for the assigned feature.
@@ -136,7 +136,7 @@ It is used to integrate Developer work that the Team Leader has approved for the
 A Developer task branch follows:
 
 ```text
-dev_<feature>_<task>
+<feature>/<task>
 ```
 
 It contains implementation work for a bounded task assigned by the relevant Team Leader.
@@ -173,7 +173,7 @@ Conceptually:
 
 ```text
 test
-  -> lider_<feature>
+  -> <feature>/common
 ```
 
 Before branch creation, verify that the working tree is clean and the local integration baseline is current according to the applicable workflow.
@@ -189,8 +189,8 @@ A Developer branch must be created from the authorized Team Leader branch for it
 Conceptually:
 
 ```text
-lider_<feature>
-  -> dev_<feature>_<task>
+<feature>/common
+  -> <feature>/<task>
 ```
 
 A Developer must not create its implementation branch directly from `main` as a shortcut around the governed hierarchy.

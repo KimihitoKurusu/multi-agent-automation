@@ -277,7 +277,7 @@ Read-only investigation and execution of permitted validation or review operatio
 A Team Leader works through a governed branch following the convention:
 
 ```text
-lider_<feature>
+<feature>/common
 ```
 
 The feature token must use the naming rules defined by the repository's branch policy when that policy is implemented.
@@ -334,7 +334,7 @@ A Developer must not:
 A Developer works through a governed branch following the convention:
 
 ```text
-dev_<feature>_<task>
+<feature>/<task>
 ```
 
 Each Developer task must have an identifiable scope.
