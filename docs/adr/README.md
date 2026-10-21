@@ -295,7 +295,7 @@ The decision log begins with the following planned baseline records:
 | ADR-0001 | Primary language and runtime | Accepted |
 | ADR-0002 | Monorepo and package management | Accepted |
 | ADR-0003 | Multi-agent hierarchy | Accepted |
-| ADR-0004 | Git branching and promotion | Planned |
+| ADR-0004 | Git branching and promotion | Accepted |
 | ADR-0005 | Policy enforcement and defense in depth | Planned |
 | ADR-0006 | Shared browser control | Planned |
 
