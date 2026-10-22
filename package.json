@@ -8,11 +8,22 @@
     "node": ">=24 <25"
   },
   "scripts": {
+    "format": "prettier --write --ignore-unknown --no-error-on-unmatched-pattern \"*.{json,yaml,yml,js,mjs,cjs,ts}\" \"{apps,packages,mcp,scripts,tests,quality}/**/*.{json,yaml,yml,js,mjs,cjs,ts}\"",
+    "format:check": "prettier --check --ignore-unknown --no-error-on-unmatched-pattern \"*.{json,yaml,yml,js,mjs,cjs,ts}\" \"{apps,packages,mcp,scripts,tests,quality}/**/*.{json,yaml,yml,js,mjs,cjs,ts}\"",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
     "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "clean": "node -e \"console.log('Nothing to clean yet')\""
   },
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
     "@types/node": "^24",
-    "typescript": "^5.9"
+    "eslint": "10.13.0",
+    "prettier": "3.9.10",
+    "typescript": "^5.9",
+    "typescript-eslint": "8.72.0",
+    "vitest": "5.0.5"
   }
 }
