@@ -151,14 +151,16 @@ Until automated branch-name validation is introduced, use these conventions manu
 - ASCII letters and digits,
 - hyphens inside feature or task tokens when needed,
 - no spaces,
-- no ambiguous generic names such as `dev_fix`, `leader_work`, or `test2`.
+- no ambiguous generic names such as `feature/fix`, `feature/work`, or `test2`,
+- `common` is reserved as the Team Leader integration token,
+- a governed feature namespace must not also have a standalone `<feature>` branch.
 
 Examples:
 
 ```text
-lider_policy-engine
-dev_policy-engine_rule-evaluator
-dev_browser-runtime_control-lease
+policy-engine/common
+policy-engine/rule-evaluator
+browser-runtime/control-lease
 ```
 
 The exact branch-name regex will be established by the quality-gate implementation.
@@ -434,7 +436,20 @@ The project uses Conventional Commits format:
 
 Optional bodies and footers may be used when useful.
 
-Examples:
+For a substantive commit containing multiple meaningful outcomes, the body must include a concise unordered bullet summary using `- ` bullets. The bullets should describe outcomes, behavior, contracts, or meaningful validation rather than merely listing filenames. A simple commit whose subject fully communicates the change does not require an artificial body.
+
+Example of a substantive commit:
+
+```text
+feat(form-interaction): add dropdown selector components
+
+- add DOM element selection basis
+- add selector options reader
+- add option selection behavior
+- cover selection behavior with tests
+```
+
+Examples of simple commits:
 
 ```text
 feat(policy-engine): add rule evaluator

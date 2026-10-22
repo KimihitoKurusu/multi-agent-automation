@@ -346,7 +346,7 @@ test
   ^
 <feature>/common
   ^
-<feature>/common
+<feature>/<task>
 
 ```
 
@@ -367,7 +367,7 @@ Each Team Leader uses a branch following the convention:
 Each Developer uses a branch following the convention:
 
 ```text
-<feature>/commonw
+<feature>/<task>
 ```
 
 Direct Developer integration into *test* is prohibited.
@@ -709,6 +709,28 @@ context.
 
 ---
 
+## 25. Protected Governance
+
+The following categories are candidates for protected project assets:
+
+- agent governance,
+- architectural decisions,
+- quality thresholds,
+- security policies,
+- protected-file definitions,
+- role permissions,
+- production promotion rules,
+- policy engine rules,
+- critical Git controls.
+
+The exact protected-file and approval implementation will be defined by later
+architecture decisions and quality configuration.
+
+Agents must not weaken governance controls simply to make a task easier to
+complete.
+
+---
+
 ## 26. Change Management
 
 Architecturally significant decisions must be documented.
@@ -772,6 +794,25 @@ completed validation,
 
 Browser automation is intentionally not required for this first
 governance milestone.
+
+---
+
+## 29. Non-Goals for the Initial Milestone
+
+The first governance milestone does not require:
+
+- unrestricted autonomous web browsing,
+- production-scale parallel agent execution,
+- autonomous production deployment,
+- CAPTCHA solving,
+- bypassing site security controls,
+- a complete visual user interface,
+- every planned MCP server,
+- every future workflow,
+- distributed multi-host execution.
+
+These capabilities must not be introduced prematurely at the expense of the
+governance foundation.
 
 ---
 
