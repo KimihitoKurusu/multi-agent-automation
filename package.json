@@ -20,15 +20,27 @@
     "validate:typecheck": "pnpm typecheck",
     "validate:test": "pnpm test",
     "validate": "pnpm validate:format && pnpm validate:lint && pnpm validate:typecheck && pnpm validate:test",
-    "clean": "node -e \"console.log('Nothing to clean yet')\""
+    "clean": "node -e \"console.log('Nothing to clean yet')\"",
+    "prepare": "husky"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
     "@types/node": "^24",
     "eslint": "10.13.0",
+    "husky": "9.1.7",
+    "lint-staged": "17.6.0",
     "prettier": "3.9.10",
     "typescript": "^5.9",
     "typescript-eslint": "8.72.0",
     "vitest": "5.0.5"
+  },
+  "lint-staged": {
+    "*.{js,mjs,cjs,ts,mts,cts}": [
+      "prettier --write",
+      "eslint --fix"
+    ],
+    "*.{json,yaml,yml}": [
+      "prettier --write"
+    ]
   }
 }
