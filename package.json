@@ -24,6 +24,7 @@
     "prepare": "husky",
     "branch:check": "tsx scripts/quality/check-branch.ts",
     "branch:check-push": "tsx scripts/quality/check-push-branches.ts",
+    "governance:check": "tsx scripts/quality/check-protected-governance.ts",
     "clean": "node -e \"console.log('Nothing to clean yet')\""
   },
   "devDependencies": {

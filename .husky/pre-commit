@@ -1,1 +1,2 @@
+pnpm governance:check
 pnpm exec lint-staged
