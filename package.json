@@ -12,6 +12,7 @@
     "format:check": "prettier --check --ignore-unknown --no-error-on-unmatched-pattern \"*.{json,yaml,yml,js,mjs,cjs,ts}\" \"{apps,packages,mcp,scripts,tests,quality}/**/*.{json,yaml,yml,js,mjs,cjs,ts}\"",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
+    "commitlint": "commitlint",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
@@ -24,6 +25,8 @@
     "prepare": "husky"
   },
   "devDependencies": {
+    "@commitlint/cli": "21.2.4",
+    "@commitlint/config-conventional": "21.2.4",
     "@eslint/js": "^10.0.1",
     "@types/node": "^24",
     "eslint": "10.13.0",
