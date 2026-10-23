@@ -93,3 +93,62 @@ export function classifyBranch(branch: string): BranchValidation {
     task,
   };
 }
+
+export const ZERO_GIT_SHA = '0000000000000000000000000000000000000000';
+
+export interface PushRefUpdate {
+  localRef: string;
+  localSha: string;
+  remoteRef: string;
+  remoteSha: string;
+}
+
+export function parsePushRefUpdate(line: string): PushRefUpdate {
+  const fields = line.trim().split(/\s+/);
+
+  if (fields.length !== 4) {
+    throw new Error(
+      'invalid pre-push input: expected local ref, local SHA, remote ref and remote SHA',
+    );
+  }
+
+  const [localRef, localSha, remoteRef, remoteSha] = fields;
+
+  if (
+    localRef === undefined ||
+    localSha === undefined ||
+    remoteRef === undefined ||
+    remoteSha === undefined
+  ) {
+    throw new Error('invalid pre-push input: missing ref update field');
+  }
+
+  return {
+    localRef,
+    localSha,
+    remoteRef,
+    remoteSha,
+  };
+}
+
+export function branchNameFromRef(ref: string): string | undefined {
+  const prefix = 'refs/heads/';
+
+  if (!ref.startsWith(prefix)) {
+    return undefined;
+  }
+
+  return ref.slice(prefix.length);
+}
+
+export function pushedBranchNames(update: PushRefUpdate): string[] {
+  if (update.localSha === ZERO_GIT_SHA) {
+    return [];
+  }
+
+  const names = [branchNameFromRef(update.localRef), branchNameFromRef(update.remoteRef)].filter(
+    (name): name is string => name !== undefined,
+  );
+
+  return [...new Set(names)];
+}

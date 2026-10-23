@@ -1,13 +1,16 @@
 import { createInterface } from 'node:readline';
 
-import { classifyBranch } from './branch-policy.js';
+import {
+  classifyBranch,
+  parsePushRefUpdate,
+  pushedBranchNames,
+  PushRefUpdate,
+} from './branch-policy.js';
 
 const input = createInterface({
   input: process.stdin,
   crlfDelay: Infinity,
 });
-
-let rejected = false;
 
 for await (const line of input) {
   const trimmed = line.trim();
@@ -16,24 +19,34 @@ for await (const line of input) {
     continue;
   }
 
-  const [localRef] = trimmed.split(/\s+/);
+  let update: PushRefUpdate;
 
-  if (localRef === undefined || !localRef.startsWith('refs/heads/')) {
+  try {
+    update = parsePushRefUpdate(trimmed);
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'unknown pre-push parsing error';
+
+    console.error(`Cannot validate pushed ref: ${message}`);
+    process.exitCode = 1;
     continue;
   }
 
-  const branch = localRef.slice('refs/heads/'.length);
-  const result = classifyBranch(branch);
+  const branchNames = pushedBranchNames(update);
 
-  if (!result.valid) {
-    console.error(`Invalid pushed branch "${branch}": ${result.reason}`);
-    rejected = true;
+  if (branchNames.length === 0) {
+    console.log(`Skipping branch naming validation for ref deletion: ${update.remoteRef}`);
     continue;
   }
 
-  console.log(`Valid pushed ${result.kind} branch: ${branch}`);
-}
+  for (const branchName of branchNames) {
+    const classification = classifyBranch(branchName);
 
-if (rejected) {
-  process.exitCode = 1;
+    if (!classification.valid) {
+      console.error(`Invalid pushed branch "${branchName}": ${classification.reason}`);
+      process.exitCode = 1;
+      continue;
+    }
+
+    console.log(`Valid pushed ${classification.kind} branch: ${branchName}`);
+  }
 }

@@ -1,28 +1,29 @@
 import { execFileSync } from 'node:child_process';
 
-import { evaluateProtectedGovernanceChange } from './protected-governance.js';
+import { evaluateProtectedGovernanceChange, parseGitNameStatus } from './protected-governance.js';
 
 function git(...args: string[]): string {
   return execFileSync('git', args, {
     encoding: 'utf8',
-  }).trim();
+  });
 }
 
-const branch = git('branch', '--show-current');
+const branch = git('branch', '--show-current').trim();
 
 if (branch === '') {
   console.error('Cannot validate protected governance from a detached HEAD.');
   process.exitCode = 2;
 } else {
-  const stagedOutput = git('diff', '--cached', '--name-only', '--diff-filter=ACMR');
+  const stagedOutput = git(
+    'diff',
+    '--cached',
+    '--name-status',
+    '--diff-filter=ACDMR',
+    '--find-renames',
+    '-z',
+  );
 
-  const stagedPaths =
-    stagedOutput === ''
-      ? []
-      : stagedOutput
-          .split(/\r?\n/)
-          .map((path) => path.trim())
-          .filter((path) => path !== '');
+  const stagedPaths = parseGitNameStatus(stagedOutput);
 
   const decision = evaluateProtectedGovernanceChange(branch, stagedPaths);
 

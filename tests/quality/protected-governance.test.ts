@@ -5,6 +5,7 @@ import {
   findProtectedGovernancePaths,
   isProtectedGovernancePath,
   normalizeRepositoryPath,
+  parseGitNameStatus,
 } from '../../scripts/quality/protected-governance.js';
 
 describe('protected governance policy', () => {
@@ -121,5 +122,67 @@ describe('protected governance change authorization', () => {
       allowed: false,
       protectedPaths: ['SECURITY.md'],
     });
+  });
+});
+
+describe('git staged path parsing', () => {
+  it('parses added modified and deleted paths', () => {
+    expect(
+      parseGitNameStatus(
+        [
+          'A',
+          'apps/web/src/new.ts',
+          'M',
+          'packages/contracts/src/index.ts',
+          'D',
+          'scripts/quality/branch-policy.ts',
+          '',
+        ].join('\0'),
+      ),
+    ).toEqual([
+      'apps/web/src/new.ts',
+      'packages/contracts/src/index.ts',
+      'scripts/quality/branch-policy.ts',
+    ]);
+  });
+
+  it('preserves both sides of a rename', () => {
+    expect(
+      parseGitNameStatus(
+        [
+          'R100',
+          'scripts/quality/branch-policy.ts',
+          'scripts/bootstrap/renamed-policy.ts',
+          '',
+        ].join('\0'),
+      ),
+    ).toEqual(['scripts/quality/branch-policy.ts', 'scripts/bootstrap/renamed-policy.ts']);
+  });
+
+  it('preserves both sides of a copy', () => {
+    expect(
+      parseGitNameStatus(
+        ['C100', 'scripts/quality/branch-policy.ts', 'scripts/bootstrap/copied-policy.ts', ''].join(
+          '\0',
+        ),
+      ),
+    ).toEqual(['scripts/quality/branch-policy.ts', 'scripts/bootstrap/copied-policy.ts']);
+  });
+
+  it('returns no paths for empty git output', () => {
+    expect(parseGitNameStatus('')).toEqual([]);
+  });
+
+  it('rejects malformed rename output', () => {
+    expect(() =>
+      parseGitNameStatus(['R100', 'scripts/quality/branch-policy.ts', ''].join('\0')),
+    ).toThrow(/requires source and destination paths/);
+  });
+  it('rejects a missing status field', () => {
+    expect(() => parseGitNameStatus('\0')).toThrow(/missing status/);
+  });
+
+  it('rejects a non-rename status without a path', () => {
+    expect(() => parseGitNameStatus('M')).toThrow(/M requires a path/);
   });
 });

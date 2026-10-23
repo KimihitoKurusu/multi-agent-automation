@@ -78,3 +78,55 @@ export function evaluateProtectedGovernanceChange(
     reason: 'protected governance changes are restricted to the governed test baseline',
   };
 }
+
+export function parseGitNameStatus(output: string): string[] {
+  if (output === '') {
+    return [];
+  }
+
+  const fields = output.split('\0');
+
+  if (fields.at(-1) === '') {
+    fields.pop();
+  }
+
+  const paths: string[] = [];
+
+  for (let index = 0; index < fields.length;) {
+    const status = fields[index];
+
+    if (status === undefined || status === '') {
+      throw new Error('invalid git name-status output: missing status');
+    }
+
+    index += 1;
+
+    const changeType = status[0];
+
+    if (changeType === 'R' || changeType === 'C') {
+      const source = fields[index];
+      const destination = fields[index + 1];
+
+      if (source === undefined || destination === undefined) {
+        throw new Error(
+          `invalid git name-status output: ${changeType} requires source and destination paths`,
+        );
+      }
+
+      paths.push(source, destination);
+      index += 2;
+      continue;
+    }
+
+    const path = fields[index];
+
+    if (path === undefined) {
+      throw new Error(`invalid git name-status output: ${status} requires a path`);
+    }
+
+    paths.push(path);
+    index += 1;
+  }
+
+  return paths;
+}
