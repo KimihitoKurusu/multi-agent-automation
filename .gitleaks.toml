@@ -1,0 +1,11 @@
+title = "multi-agent-automation secret scanning"
+
+[extend]
+useDefault = true
+
+[[rules]]
+id = "multi-agent-synthetic-secret"
+description = "Synthetic secret used only to validate the repository secret-scanning gate"
+regex = '''MULTI_AGENT_SYNTHETIC_SECRET\s*=\s*["']?([A-Za-z0-9_-]{24})'''
+secretGroup = 1
+keywords = ["MULTI_AGENT_SYNTHETIC_SECRET"]

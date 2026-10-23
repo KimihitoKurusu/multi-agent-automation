@@ -1,2 +1,3 @@
 pnpm governance:check
+pnpm secrets:staged
 pnpm exec lint-staged

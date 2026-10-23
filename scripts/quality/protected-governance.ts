@@ -10,6 +10,7 @@ const EXACT_PROTECTED_PATHS = new Set([
   'vitest.config.ts',
   '.prettierrc.json',
   '.prettierignore',
+  '.gitleaks.toml',
 ]);
 
 const PROTECTED_PREFIXES = [

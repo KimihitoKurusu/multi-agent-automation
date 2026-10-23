@@ -27,6 +27,8 @@
     "branch:check-push": "tsx scripts/quality/check-push-branches.ts",
     "governance:check": "tsx scripts/quality/check-protected-governance.ts",
     "architecture:check": "tsx scripts/quality/check-architecture.ts",
+    "secrets:staged": "gitleaks git --staged --redact --no-banner",
+    "secrets:scan": "gitleaks git --redact --no-banner .",
     "clean": "node -e \"console.log('Nothing to clean yet')\""
   },
   "devDependencies": {
