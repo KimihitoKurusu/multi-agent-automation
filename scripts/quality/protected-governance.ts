@@ -15,6 +15,7 @@ const EXACT_PROTECTED_PATHS = new Set([
 
 const PROTECTED_PREFIXES = [
   'docs/adr/ADR-',
+  '.github/workflows/',
   '.husky/',
   'scripts/quality/',
   'tests/quality/',

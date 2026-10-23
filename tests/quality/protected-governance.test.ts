@@ -27,6 +27,7 @@ describe('protected governance policy', () => {
     'scripts/quality/branch-policy.ts',
     'tests/quality/branch-policy.test.ts',
     '.gitleaks.toml',
+    '.github/workflows/quality.yml',
   ])('protects %s', (path) => {
     expect(isProtectedGovernancePath(path)).toBe(true);
   });
