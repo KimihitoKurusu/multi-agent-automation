@@ -10,6 +10,18 @@ export default defineConfig({
       'scripts/**/*.test.ts',
       'tests/**/*.test.ts',
     ],
-    passWithNoTests: true,
+    coverage: {
+      provider: 'v8',
+      reporter: ['text', 'json-summary'],
+      reportsDirectory: 'coverage',
+      include: ['scripts/quality/**/*.ts'],
+      exclude: ['scripts/quality/check-*.ts'],
+      thresholds: {
+        statements: 90,
+        branches: 90,
+        functions: 90,
+        lines: 90,
+      },
+    },
   },
 });
