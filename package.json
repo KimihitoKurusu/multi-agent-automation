@@ -28,6 +28,7 @@
     "branch:check": "tsx scripts/quality/check-branch.ts",
     "branch:check-push": "tsx scripts/quality/check-push-branches.ts",
     "governance:check": "tsx scripts/quality/check-protected-governance.ts",
+    "governance:check-pr": "tsx scripts/quality/check-protected-governance-pr.ts",
     "architecture:check": "tsx scripts/quality/check-architecture.ts",
     "secrets:staged": "gitleaks git --staged --redact --no-banner",
     "secrets:scan": "gitleaks git --redact --no-banner .",
