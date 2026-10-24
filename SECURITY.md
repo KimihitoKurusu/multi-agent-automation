@@ -959,3 +959,5 @@ data-handling requirements
 A successful technical outcome does not excuse a security-policy violation.
 
 When safe execution and task completion conflict, safe execution takes precedence.
+
+<!-- adversarial governance fixture -->
