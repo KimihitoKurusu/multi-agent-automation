@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import {
   evaluateProtectedGovernanceChange,
+  evaluateProtectedGovernancePullRequest,
   findProtectedGovernancePaths,
   isProtectedGovernancePath,
   normalizeRepositoryPath,
@@ -184,5 +185,70 @@ describe('git staged path parsing', () => {
 
   it('rejects a non-rename status without a path', () => {
     expect(() => parseGitNameStatus('M')).toThrow(/M requires a path/);
+  });
+});
+
+it('allows protected governance on a Governance branch', () => {
+  expect(evaluateProtectedGovernanceChange('governance/opencode-agents', ['AGENTS.md'])).toEqual({
+    allowed: true,
+    branch: 'governance/opencode-agents',
+    protectedPaths: ['AGENTS.md'],
+  });
+});
+
+describe('protected governance pull request authorization', () => {
+  it('allows protected governance from a Governance branch into test', () => {
+    expect(
+      evaluateProtectedGovernancePullRequest('governance/opencode-agents', 'test', ['AGENTS.md']),
+    ).toEqual({
+      allowed: true,
+      sourceBranch: 'governance/opencode-agents',
+      destinationBranch: 'test',
+      protectedPaths: ['AGENTS.md'],
+    });
+  });
+
+  it('rejects protected governance from a Governance branch into main', () => {
+    expect(
+      evaluateProtectedGovernancePullRequest('governance/opencode-agents', 'main', ['AGENTS.md']),
+    ).toMatchObject({
+      allowed: false,
+      sourceBranch: 'governance/opencode-agents',
+      destinationBranch: 'main',
+      protectedPaths: ['AGENTS.md'],
+    });
+  });
+
+  it('rejects protected governance from a Developer branch into test', () => {
+    expect(
+      evaluateProtectedGovernancePullRequest('opencode/agent-configuration', 'test', ['AGENTS.md']),
+    ).toMatchObject({
+      allowed: false,
+      sourceBranch: 'opencode/agent-configuration',
+      destinationBranch: 'test',
+    });
+  });
+
+  it('rejects protected governance from a Leader branch into test', () => {
+    expect(
+      evaluateProtectedGovernancePullRequest('opencode/common', 'test', ['AGENTS.md']),
+    ).toMatchObject({
+      allowed: false,
+      sourceBranch: 'opencode/common',
+      destinationBranch: 'test',
+    });
+  });
+
+  it('allows ordinary pull requests without protected governance changes', () => {
+    expect(
+      evaluateProtectedGovernancePullRequest('opencode/agent-configuration', 'test', [
+        'src/example.ts',
+      ]),
+    ).toEqual({
+      allowed: true,
+      sourceBranch: 'opencode/agent-configuration',
+      destinationBranch: 'test',
+      protectedPaths: [],
+    });
   });
 });

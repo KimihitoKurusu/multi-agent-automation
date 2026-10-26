@@ -1,6 +1,7 @@
 export const BRANCH_KINDS = {
   production: 'production',
   integration: 'integration',
+  governance: 'governance',
   leader: 'leader',
   developer: 'developer',
 } as const;
@@ -65,6 +66,23 @@ export function classifyBranch(branch: string): BranchValidation {
       valid: false,
       branch,
       reason: 'feature and task tokens must use lowercase ASCII kebab-case',
+    };
+  }
+
+  if (feature === 'governance') {
+    if (task === RESERVED_TOKEN) {
+      return {
+        valid: false,
+        branch,
+        reason: 'common is reserved and cannot be used as a governance task',
+      };
+    }
+
+    return {
+      valid: true,
+      branch,
+      kind: BRANCH_KINDS.governance,
+      task,
     };
   }
 

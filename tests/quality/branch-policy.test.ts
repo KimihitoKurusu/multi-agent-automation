@@ -15,6 +15,8 @@ describe('branch policy', () => {
     ['form-interaction/common', 'leader'],
     ['form-interaction/text-input', 'developer'],
     ['browser-runtime/control-lease', 'developer'],
+    ['governance/opencode-agents', 'governance'],
+    ['governance/quality-policy', 'governance'],
   ])('accepts %s as %s', (branch, kind) => {
     expect(classifyBranch(branch)).toMatchObject({
       valid: true,
@@ -32,6 +34,10 @@ describe('branch policy', () => {
     'form interaction/common',
     'form-interaction/Common',
     'common/foo',
+    'governance/common',
+    'governance/foo/bar',
+    'governance/',
+    'Governance/foo',
   ])('rejects invalid branch %s', (branch) => {
     expect(classifyBranch(branch)).toMatchObject({
       valid: false,
@@ -127,5 +133,14 @@ describe('pre-push ref policy', () => {
         remoteSha: 'bbb',
       }),
     ).toEqual([]);
+  });
+});
+
+it('extracts the task from a Governance branch', () => {
+  expect(classifyBranch('governance/opencode-agents')).toEqual({
+    valid: true,
+    branch: 'governance/opencode-agents',
+    kind: 'governance',
+    task: 'opencode-agents',
   });
 });
