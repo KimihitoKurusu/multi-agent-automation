@@ -13,6 +13,7 @@ const EXACT_PROTECTED_PATHS = new Set([
   '.prettierrc.json',
   '.prettierignore',
   '.gitleaks.toml',
+  'opencode.jsonc',
 ]);
 
 const PROTECTED_PREFIXES = [
@@ -21,6 +22,7 @@ const PROTECTED_PREFIXES = [
   '.husky/',
   'scripts/quality/',
   'tests/quality/',
+  '.opencode/',
 ] as const;
 
 export function normalizeRepositoryPath(path: string): string {

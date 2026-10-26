@@ -1,0 +1,76 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+
+  "default_agent": "architect",
+
+  "agents": {
+    "build": {
+      "disabled": true,
+    },
+    "plan": {
+      "disabled": true,
+    },
+    "general": {
+      "disabled": true,
+    },
+    "explore": {
+      "disabled": true,
+    },
+  },
+
+  "permissions": [
+    {
+      "action": "external_directory",
+      "resource": "*",
+      "effect": "deny",
+    },
+
+    {
+      "action": "read",
+      "resource": "*.env",
+      "effect": "deny",
+    },
+    {
+      "action": "read",
+      "resource": "*.env.*",
+      "effect": "deny",
+    },
+    {
+      "action": "read",
+      "resource": "*.env.example",
+      "effect": "allow",
+    },
+
+    {
+      "action": "read",
+      "resource": "*.pem",
+      "effect": "deny",
+    },
+    {
+      "action": "read",
+      "resource": "*.key",
+      "effect": "deny",
+    },
+    {
+      "action": "read",
+      "resource": "*.p12",
+      "effect": "deny",
+    },
+    {
+      "action": "read",
+      "resource": "*.pfx",
+      "effect": "deny",
+    },
+
+    {
+      "action": "shell",
+      "resource": "git push *",
+      "effect": "deny",
+    },
+    {
+      "action": "shell",
+      "resource": "*--no-verify*",
+      "effect": "deny",
+    },
+  ],
+}

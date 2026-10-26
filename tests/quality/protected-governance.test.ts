@@ -30,6 +30,12 @@ describe('protected governance policy', () => {
     'tests/quality/branch-policy.test.ts',
     '.gitleaks.toml',
     '.github/workflows/quality.yml',
+    'opencode.jsonc',
+    '.opencode/agents/architect.md',
+    '.opencode/agents/team-leader.md',
+    '.opencode/agents/developer.md',
+    '.opencode/agents/researcher.md',
+    '.opencode/skills/good-morning/SKILL.md',
   ])('protects %s', (path) => {
     expect(isProtectedGovernancePath(path)).toBe(true);
   });
@@ -45,6 +51,7 @@ describe('protected governance policy', () => {
     'apps/web/src/index.ts',
     'packages/contracts/src/index.ts',
     'mcp/browser/src/server.ts',
+    'agents/architect.md',
   ])('does not classify %s as protected governance', (path) => {
     expect(isProtectedGovernancePath(path)).toBe(false);
   });
