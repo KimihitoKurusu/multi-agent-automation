@@ -47,11 +47,13 @@ jobs:
         if: github.event_name == 'pull_request'
         env:
           PR_SOURCE_BRANCH: ${{ github.event.pull_request.head.ref }}
+          PR_DESTINATION_BRANCH: ${{ github.event.pull_request.base.ref }}
           PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
           PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
         run: >-
           pnpm governance:check-pr
           "$PR_SOURCE_BRANCH"
+          "$PR_DESTINATION_BRANCH"
           "$PR_BASE_SHA"
           "$PR_HEAD_SHA"
 

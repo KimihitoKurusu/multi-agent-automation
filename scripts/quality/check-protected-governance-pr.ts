@@ -1,6 +1,9 @@
 import { execFileSync } from 'node:child_process';
 
-import { evaluateProtectedGovernanceChange, parseGitNameStatus } from './protected-governance.js';
+import {
+  parseGitNameStatus,
+  evaluateProtectedGovernancePullRequest,
+} from './protected-governance.js';
 
 function git(...args: string[]): string {
   return execFileSync('git', args, {
@@ -20,8 +23,9 @@ function requiredArgument(index: number, name: string): string {
 
 try {
   const sourceBranch = requiredArgument(2, 'source branch');
-  const baseSha = requiredArgument(3, 'base SHA');
-  const headSha = requiredArgument(4, 'head SHA');
+  const destinationBranch = requiredArgument(3, 'destination branch');
+  const baseSha = requiredArgument(4, 'base SHA');
+  const headSha = requiredArgument(5, 'head SHA');
 
   const changedOutput = git(
     'diff',
@@ -33,16 +37,22 @@ try {
   );
 
   const changedPaths = parseGitNameStatus(changedOutput);
-  const result = evaluateProtectedGovernanceChange(sourceBranch, changedPaths);
+  const result = evaluateProtectedGovernancePullRequest(
+    sourceBranch,
+    destinationBranch,
+    changedPaths,
+  );
 
   if (result.protectedPaths.length === 0) {
-    console.log(`No protected governance changes found in pull request from ${sourceBranch}.`);
+    console.log(
+      `No protected governance changes found in pull request from ${sourceBranch} to ${destinationBranch}.`,
+    );
     process.exit(0);
   }
 
   if (!result.allowed) {
     console.error(
-      `Protected governance changes are not authorized from pull request branch "${sourceBranch}":`,
+      `Protected governance changes are not authorized from pull request branch "${sourceBranch}" to "${destinationBranch}":`,
     );
 
     for (const path of result.protectedPaths) {
@@ -53,7 +63,7 @@ try {
   }
 
   console.log(
-    `Protected governance changes authorized from pull request branch "${sourceBranch}":`,
+    `Protected governance changes authorized from pull request branch "${sourceBranch}" to "${destinationBranch}":`,
   );
 
   for (const path of result.protectedPaths) {

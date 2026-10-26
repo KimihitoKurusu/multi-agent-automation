@@ -1,3 +1,5 @@
+import { BRANCH_KINDS, classifyBranch } from './branch-policy.js';
+
 const EXACT_PROTECTED_PATHS = new Set([
   'AGENTS.md',
   'SECURITY.md',
@@ -35,6 +37,12 @@ export function isProtectedGovernancePath(path: string): boolean {
   return PROTECTED_PREFIXES.some((prefix) => normalized.startsWith(prefix));
 }
 
+function isGovernanceBranch(branch: string): boolean {
+  const classification = classifyBranch(branch);
+
+  return classification.valid && classification.kind === BRANCH_KINDS.governance;
+}
+
 export function findProtectedGovernancePaths(paths: readonly string[]): string[] {
   return paths
     .map(normalizeRepositoryPath)
@@ -63,7 +71,7 @@ export function evaluateProtectedGovernanceChange(
     };
   }
 
-  if (branch === 'test') {
+  if (branch === 'test' || isGovernanceBranch(branch)) {
     return {
       allowed: true,
       branch,
@@ -129,4 +137,47 @@ export function parseGitNameStatus(output: string): string[] {
   }
 
   return paths;
+}
+
+export interface ProtectedGovernancePullRequestDecision {
+  allowed: boolean;
+  sourceBranch: string;
+  destinationBranch: string;
+  protectedPaths: string[];
+  reason?: string;
+}
+
+export function evaluateProtectedGovernancePullRequest(
+  sourceBranch: string,
+  destinationBranch: string,
+  changedPaths: readonly string[],
+): ProtectedGovernancePullRequestDecision {
+  const protectedPaths = findProtectedGovernancePaths(changedPaths);
+
+  if (protectedPaths.length === 0) {
+    return {
+      allowed: true,
+      sourceBranch,
+      destinationBranch,
+      protectedPaths,
+    };
+  }
+
+  if (destinationBranch === 'test' && isGovernanceBranch(sourceBranch)) {
+    return {
+      allowed: true,
+      sourceBranch,
+      destinationBranch,
+      protectedPaths,
+    };
+  }
+
+  return {
+    allowed: false,
+    sourceBranch,
+    destinationBranch,
+    protectedPaths,
+    reason:
+      'protected governance pull requests require a governance/<task> source branch targeting test',
+  };
 }
