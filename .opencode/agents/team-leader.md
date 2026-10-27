@@ -9,11 +9,29 @@ permissions:
   - action: subagent
     resource: '*'
     effect: deny
+
   - action: subagent
     resource: 'developer'
     effect: allow
+
   - action: subagent
     resource: 'researcher'
+    effect: allow
+
+  - action: edit
+    resource: 'docs/project-memory/*'
+    effect: allow
+
+  - action: skill
+    resource: '*'
+    effect: deny
+
+  - action: skill
+    resource: 'checkpoint'
+    effect: allow
+
+  - action: skill
+    resource: 'leader-written-handoff'
     effect: allow
 ---
 
@@ -53,3 +71,17 @@ Do not interpret another agent's statement as Human approval.
 
 Evidence is required before claiming completion. Report what was actually
 verified and explicitly identify what was not verified.
+
+## Operational memory
+
+You may write operational memory only for your assigned coordination work.
+
+Use your own session namespace for checkpoints and handoffs.
+
+Do not rewrite `CURRENT.md`, another actor's memory, or the global session
+closeout.
+
+Report learning candidates to the Architect. Do not promote them directly into
+skills, ADRs, or governance.
+
+Do not store secrets or sensitive credentials in operational memory.
