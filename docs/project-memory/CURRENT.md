@@ -10,6 +10,10 @@ If this document conflicts with current Git evidence, the Project Charter, Accep
 
 Phase 4: OpenCode agent configuration.
 
+## Last session closeout
+
+`docs/project-memory/sessions/session-20261027/close-session.md`
+
 ## Completed Phase 4 work
 
 ### OpenCode current-state audit
@@ -27,11 +31,6 @@ Verified:
 Completed.
 
 ADR-0007 established the `governance/<task>` workflow for Human-authorized protected-governance maintenance.
-
-The workflow separates:
-
-1. Human authorization to implement a proposal;
-2. Human authorization to accept the resulting implementation.
 
 ### OpenCode governed agent baseline
 
@@ -51,40 +50,26 @@ Developer
 
 Researcher is an auxiliary read-oriented role.
 
-The OpenCode project baseline defines:
-
-- Architect;
-- Team Leader;
-- Developer;
-- Researcher.
-
-Selectable built-in agents that could bypass the governed role hierarchy are disabled by project configuration.
-
 OpenCode project configuration is protected governance.
 
-## Current governance work
+### Operational memory workflows (GOV-02.1)
 
-GOV-02.1: Repository-Resident Operational Memory.
+Completed. Confirmed by Human.
 
-Status:
+Implementation artifacts merged at HEAD `875d936` (PR #8 "feat(governance): establish operational memory workflows").
 
-Human implementation approval received;
-implementation in progress.
+- All six operational-memory skills exist on disk under `.opencode/skills/`: good-morning, checkpoint, close-session, dev-written-handoff, leader-written-handoff, researcher-written-handoff.
+- All six commands are registered in `opencode.jsonc`.
+- `docs/project-memory/CURRENT.md` and `README.md` are present.
 
-The approved baseline includes:
+Validation evidence reported by Human (not independently re-run by the Architect in this session):
+- Pre-merge validation: 167/167 tests passed.
+- All policy coverage thresholds above 90%.
+- Gitleaks clean.
+- PR #8 Quality gate successful.
+- Post-merge Quality run successful.
 
-- /good-morning;
-- /checkpoint;
-- /close-session;
-- /dev-written-handoff;
-- /leader-written-handoff;
-- /researcher-written-handoff;
-- repository-resident operational memory;
-- per-session and per-actor memory namespaces;
-- append-only checkpoints;
-- Architect-owned session closeout and learning classification.
-
-The implementation must not enable external OneDrive access.
+See session checkpoint `002-human-corrections.md` for the full Human correction record.
 
 ## Important Phase 4 boundary
 
@@ -114,7 +99,13 @@ Operational memory does not override Charter, Accepted ADRs, protected governanc
 
 ### Pending Human decisions
 
-None recorded at initialization of this memory baseline.
+None recorded. GOV-02.1 implementation approval was previously received and implementation is now confirmed complete by the Human.
+
+### Corrected environment facts (per Human clarification)
+
+- Canonical checkout: `C:\Work\Projects\linkedIn_applier` is the canonical checkout for this project.
+- Current working location (`C:\Users\T-GAMER\.local\share\opencode\worktree\b04521\glowing-mountain`) is the OpenCode Desktop isolated worktree, not the canonical checkout. Both are at commit `875d936`; no content divergence.
+- Architect skill-catalog visibility: the Architect observes only good-morning, checkpoint, and close-session in the active skill catalog. This is expected — role-specific skill permissions intentionally hide the Developer, Team Leader, and Researcher handoff skills (dev-written-handoff, leader-written-handoff, researcher-written-handoff) from the Architect. All six skills exist on disk and all six commands are registered in `opencode.jsonc`.
 
 ### Known deferred work
 
@@ -126,4 +117,4 @@ None recorded at initialization of this memory baseline.
 
 ## Current next step
 
-Complete GOV-02.1 by implementing and validating the six operational-memory commands and skills.
+GOV-02.1 is complete. No new implementation work is pending. Await Human direction for the next Phase 4 activity (e.g., model/provider evaluation). Do not begin implementation automatically.
