@@ -30,6 +30,30 @@ export interface OpenCodeProjectConfig {
   agents?: Record<string, { disabled?: boolean }>;
 }
 
+export interface OpenCodeCommandDefinition {
+  description?: string;
+  template?: string;
+  agent?: string;
+  model?: unknown;
+  subagent?: boolean;
+  subtask?: boolean;
+}
+
+export interface OpenCodeProjectConfig {
+  default_agent?: string;
+  model?: unknown;
+  permissions?: PermissionRule[];
+  agents?: Record<string, { disabled?: boolean }>;
+  commands?: Record<string, OpenCodeCommandDefinition>;
+}
+
+export interface OpenCodeSkillDefinition {
+  id: string;
+  name: string;
+  description: string;
+  source: string;
+}
+
 const EXPECTED_MODES: Record<GovernedAgentId, AgentMode> = {
   architect: 'primary',
   developer: 'subagent',
@@ -104,6 +128,43 @@ const REQUIRED_GLOBAL_PERMISSIONS: readonly PermissionRule[] = [
   },
 ];
 
+export const OPERATIONAL_MEMORY_COMMAND_IDS = [
+  'checkpoint',
+  'close-session',
+  'dev-written-handoff',
+  'good-morning',
+  'leader-written-handoff',
+  'researcher-written-handoff',
+] as const;
+
+export const OPERATIONAL_MEMORY_SKILL_IDS = [
+  'checkpoint',
+  'close-session',
+  'dev-written-handoff',
+  'good-morning',
+  'leader-written-handoff',
+  'researcher-written-handoff',
+] as const;
+
+const EXPECTED_COMMAND_AGENTS: Record<
+  (typeof OPERATIONAL_MEMORY_COMMAND_IDS)[number],
+  GovernedAgentId | undefined
+> = {
+  checkpoint: undefined,
+  'close-session': 'architect',
+  'dev-written-handoff': 'developer',
+  'good-morning': 'architect',
+  'leader-written-handoff': 'team-leader',
+  'researcher-written-handoff': 'researcher',
+};
+
+const EXPECTED_SKILL_ACCESS: Record<GovernedAgentId, ReadonlySet<string>> = {
+  architect: new Set(['checkpoint', 'close-session', 'good-morning']),
+  developer: new Set(['checkpoint', 'dev-written-handoff']),
+  researcher: new Set(['checkpoint', 'researcher-written-handoff']),
+  'team-leader': new Set(['checkpoint', 'leader-written-handoff']),
+};
+
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
 }
@@ -135,6 +196,45 @@ function parsePermissionEffect(value: string, path: string): PermissionEffect {
   }
 
   throw new Error(`invalid OpenCode permission effect in ${path}: ${value}`);
+}
+
+export function parseOpenCodeSkill(
+  id: string,
+  source: string,
+  path: string,
+): OpenCodeSkillDefinition {
+  const match = /^---\r?\n([\s\S]*?)\r?\n---(?:\r?\n|$)/.exec(source);
+
+  if (match?.[1] === undefined) {
+    throw new Error(`missing OpenCode skill frontmatter: ${path}`);
+  }
+
+  const frontmatter = match[1];
+  const name = readFrontmatterField(frontmatter, 'name');
+  const description = readFrontmatterField(frontmatter, 'description');
+
+  if (name === undefined || name === '') {
+    throw new Error(`missing OpenCode skill name: ${path}`);
+  }
+
+  if (description === undefined || description === '') {
+    throw new Error(`missing OpenCode skill description: ${path}`);
+  }
+
+  if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(name)) {
+    throw new Error(`invalid OpenCode skill name: ${path}`);
+  }
+
+  if (name !== id) {
+    throw new Error(`OpenCode skill name must match directory: ${path}`);
+  }
+
+  return {
+    id,
+    name,
+    description,
+    source,
+  };
 }
 
 function readFrontmatterField(frontmatter: string, field: string): string | undefined {
@@ -220,6 +320,13 @@ export function parseOpenCodeAgent(
   };
 }
 
+function matchesPermissionPattern(pattern: string, value: string): boolean {
+  const escaped = pattern.replace(/[.+^${}()|[\]\\]/g, '\\$&');
+  const expression = escaped.replaceAll('*', '.*').replaceAll('?', '.');
+
+  return new RegExp(`^${expression}$`).test(value);
+}
+
 export function findLastMatchingPermission(
   permissions: readonly PermissionRule[],
   action: string,
@@ -227,8 +334,8 @@ export function findLastMatchingPermission(
 ): PermissionRule | undefined {
   return permissions.findLast(
     (permission) =>
-      (permission.action === '*' || permission.action === action) &&
-      (permission.resource === '*' || permission.resource === resource),
+      matchesPermissionPattern(permission.action, action) &&
+      matchesPermissionPattern(permission.resource, resource),
   );
 }
 
@@ -313,6 +420,28 @@ export function validateOpenCodePolicy(
         violations.push(`${agentId} delegation to ${targetAgentId} must be ${expectedEffect}`);
       }
     }
+
+    for (const skillId of OPERATIONAL_MEMORY_SKILL_IDS) {
+      const expectedEffect = EXPECTED_SKILL_ACCESS[agentId].has(skillId) ? 'allow' : 'deny';
+
+      const skillPermission = findLastMatchingPermission(agent.permissions, 'skill', skillId);
+
+      if (skillPermission?.effect !== expectedEffect) {
+        violations.push(`${agentId} skill access to ${skillId} must be ${expectedEffect}`);
+      }
+    }
+
+    if (agentId === 'architect' || agentId === 'team-leader' || agentId === 'researcher') {
+      const memoryEdit = findLastMatchingPermission(
+        agent.permissions,
+        'edit',
+        'docs/project-memory/example.md',
+      );
+
+      if (memoryEdit?.effect !== 'allow') {
+        violations.push(`${agentId} operational-memory edit permission must be allow`);
+      }
+    }
   }
 
   const researcher = agents.researcher;
@@ -322,6 +451,61 @@ export function validateOpenCodePolicy(
     findLastMatchingPermission(researcher.permissions, 'shell', '*')?.effect !== 'deny'
   ) {
     violations.push('researcher shell permission must be deny');
+  }
+
+  const configuredCommands = config.commands ?? {};
+  const configuredCommandIds = Object.keys(configuredCommands).sort();
+  const expectedCommandIds = [...OPERATIONAL_MEMORY_COMMAND_IDS].sort();
+
+  if (configuredCommandIds.join('|') !== expectedCommandIds.join('|')) {
+    violations.push(`OpenCode commands must be exactly: ${expectedCommandIds.join(', ')}`);
+  }
+
+  for (const commandId of OPERATIONAL_MEMORY_COMMAND_IDS) {
+    const command = configuredCommands[commandId];
+
+    if (command === undefined) {
+      continue;
+    }
+
+    if (command.description === undefined || command.description.trim() === '') {
+      violations.push(`${commandId} command must have a description`);
+    }
+
+    if (command.template === undefined || command.template.trim() === '') {
+      violations.push(`${commandId} command must have a template`);
+      continue;
+    }
+
+    if (!command.template.includes(`\`${commandId}\` skill`)) {
+      violations.push(`${commandId} command must load its matching skill`);
+    }
+
+    if (command.template.includes('!`')) {
+      violations.push(`${commandId} command must not contain embedded shell`);
+    }
+
+    if (command.model !== undefined) {
+      violations.push(`${commandId} command must not override the model`);
+    }
+
+    if (command.subagent !== undefined) {
+      violations.push(`${commandId} command must not configure subagent execution`);
+    }
+
+    if (command.subtask !== undefined) {
+      violations.push(`${commandId} command must not use deprecated subtask`);
+    }
+
+    const expectedAgent = EXPECTED_COMMAND_AGENTS[commandId];
+
+    if (command.agent !== expectedAgent) {
+      violations.push(
+        expectedAgent === undefined
+          ? `${commandId} command must use the current agent`
+          : `${commandId} command must use ${expectedAgent}`,
+      );
+    }
   }
 
   return violations.sort((left, right) => left.localeCompare(right));

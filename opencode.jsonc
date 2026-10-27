@@ -18,6 +18,43 @@
     },
   },
 
+  "commands": {
+    "good-morning": {
+      "description": "Reconstruct the governed project state before starting work",
+      "agent": "architect",
+      "template": "Load and follow the `good-morning` skill.\n\nReconstruct the current project state before proposing new work.\n\nDo not begin implementation.\n\nFinish by presenting the reconstructed state, unresolved Human decisions, contradictions or stale memory, and the recommended next action.\n\nThen wait for Human direction.",
+    },
+
+    "checkpoint": {
+      "description": "Capture an evidence-based checkpoint for the current actor",
+      "template": "Load and follow the `checkpoint` skill.\n\nCapture the current actor's work state.\n\nDo not claim verification that did not actually occur.\n\nDo not modify another actor's checkpoint or handoff.",
+    },
+
+    "close-session": {
+      "description": "Coordinate the governed closeout of the current working session",
+      "agent": "architect",
+      "template": "Load and follow the `close-session` skill.\n\nCoordinate the session closeout using the governed role hierarchy.\n\nCollect subordinate evidence before producing the global closeout.\n\nClassify learning candidates without automatically promoting them into skills, ADRs, security policy, or governance.",
+    },
+
+    "dev-written-handoff": {
+      "description": "Produce the Developer delivery handoff for a bounded task",
+      "agent": "developer",
+      "template": "Load and follow the `dev-written-handoff` skill.\n\nProduce an evidence-based delivery for the assigned Team Leader.\n\nReport what was verified, what remains unverified, and the exact delivered Git state when available.",
+    },
+
+    "leader-written-handoff": {
+      "description": "Produce the Team Leader handoff for Architect review",
+      "agent": "team-leader",
+      "template": "Load and follow the `leader-written-handoff` skill.\n\nProduce an evidence-based feature or work-batch handoff for the Architect.\n\nDo not represent Team Leader approval as authorization to integrate into `test`.",
+    },
+
+    "researcher-written-handoff": {
+      "description": "Produce a Researcher evidence handoff for the requesting authority",
+      "agent": "researcher",
+      "template": "Load and follow the `researcher-written-handoff` skill.\n\nSeparate verified facts, evidence, assumptions, recommendations, conflicting evidence, and unresolved questions.",
+    },
+  },
+
   "permissions": [
     {
       "action": "external_directory",
