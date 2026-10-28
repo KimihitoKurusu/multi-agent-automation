@@ -53,6 +53,11 @@
       "agent": "researcher",
       "template": "Load and follow the `researcher-written-handoff` skill.\n\nSeparate verified facts, evidence, assumptions, recommendations, conflicting evidence, and unresolved questions.",
     },
+    "finalize-session": {
+      "description": "Finalize a Human-confirmed prepared session closeout",
+      "agent": "architect",
+      "template": "Load and follow the `finalize-session` skill.\n\nFinalize the prepared session only after an explicit Human close decision.\n\nRecord accepted, rejected, deferred, reclassified, or unresolved candidates.\n\nWrite the immutable closeout exactly once, update CURRENT.md, mark the session closed, and do not begin new work.",
+    },
   },
 
   "permissions": [

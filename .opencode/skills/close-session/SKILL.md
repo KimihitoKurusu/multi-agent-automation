@@ -8,10 +8,26 @@ compatibility: opencode
 
 ## Ownership
 
-Only the Architect owns the global session closeout.
+Only the Architect prepares a global session close.
 
-The closeout is collaborative evidence collection followed by Architect
-classification.
+This workflow prepares closure. It does not finalize closure.
+
+Only the `finalize-session` workflow may:
+
+- write `close-session.md`;
+- update the session state to `CLOSED`;
+- perform the final `CURRENT.md` update.
+
+Before beginning close preparation:
+
+1. identify the current session;
+2. read `SESSION.json`;
+3. require state `OPEN`;
+4. verify that `close-session.md` does not already exist.
+
+If the session is already `CLOSE_PREPARED` or `CLOSED`, stop.
+
+Never overwrite an existing `close-session.md`.
 
 ## Phase 1: stop expanding work
 
@@ -82,11 +98,11 @@ Record:
 - which source currently has greater authority;
 - anything that still requires Human resolution.
 
-## Phase 7: classify learning candidates
+## Phase 7: classify candidates provisionally
 
 Collect candidates from Architect, Team Leaders, Developers, and Researchers.
 
-Classify each candidate as one of:
+Classify each candidate provisionally as one of:
 
 - INCIDENTAL
 - ENVIRONMENT_REFERENCE
@@ -96,6 +112,22 @@ Classify each candidate as one of:
 - GOVERNANCE_CANDIDATE
 - SECURITY_FINDING
 - HUMAN_DECISION_PENDING
+
+Provisional classification does not promote any candidate.
+
+For each candidate that needs a Human disposition, request one of:
+
+- ACCEPT_FOR_PROPOSAL
+- ACCEPT_AS_BACKLOG
+- ACCEPT_AS_REFERENCE
+- DEFER
+- REJECT
+- NEEDS_MORE_EVIDENCE
+
+`ACCEPT_FOR_PROPOSAL` authorizes later proposal preparation only.
+
+It does not authorize implementation, protected-governance editing, creation of
+a governance branch, or integration.
 
 Team Leader recommendations may inform classification.
 
@@ -136,91 +168,98 @@ item.
 
 Carry the decision forward into `CURRENT.md`.
 
-## Phase 8: write the session closeout
+## Phase 8: record integration disposition
 
-Write the global session closeout as:
+Record exactly one observed or proposed integration disposition:
 
-`docs/project-memory/sessions/<session-id>/close-session.md`
+- NO_CHANGES
+- UNCOMMITTED_WORK
+- COMMITTED_NOT_PUSHED
+- PR_OPEN
+- MERGED
+- DEFERRED
+- DISCARD_APPROVED
 
-Once published, the closeout is historical evidence and should not be silently
-rewritten.
+Do not change integration state during close preparation.
 
-Include:
+Do not:
 
-# Session Closeout
+- commit;
+- push;
+- open a pull request;
+- merge;
+- discard working-tree changes;
+- remove a worktree;
+- create a governance branch.
+
+## Phase 9: write close preparation
+
+Write the next sequential Architect checkpoint:
+
+`docs/project-memory/sessions/<session-id>/architect/checkpoints/NNN-close-preparation.md`
+
+The checkpoint must contain:
+
+# Close Preparation
 
 - Session:
-- Closed by: Architect
+- State: CLOSE_PREPARED
+- Prepared by: Architect
 - Timestamp:
-- Final branch:
-- Final HEAD:
-
-## Work completed
+- Worktree:
+- Branch:
+- HEAD:
 
 ## Evidence collected
 
-## Validation summary
+## Missing evidence
+
+## Work completed
+
+## Work still in progress
+
+## Working-tree changes
+
+## Validation performed
 
 ## Not verified
-
-## Failed approaches worth preserving
 
 ## Contradictions
 
 ## Human decisions observed
 
+## Proposed learning classification
+
+## Candidate decisions requested
+
+## Integration disposition
+
 ## Pending Human decisions
 
-## Blockers
-
-## Learning classification
-
-## Security findings
-
-## Open work
-
-## Next recommended focus
+## Proposed next-session focus
 
 ## Source checkpoints and handoffs
 
-Reference the evidence used for the closeout.
+Finish the checkpoint with:
 
-## Phase 9: update CURRENT
+> Awaiting Human close decision. No close-session.md has been written.
 
-After writing the historical closeout, update
-`docs/project-memory/CURRENT.md`.
+## Phase 10: update the session manifest
 
-CURRENT is a concise mutable pointer to the latest governed project state.
+Update `SESSION.json`:
 
-Keep it short enough for `/good-morning`.
+- change `state` from `OPEN` to `CLOSE_PREPARED`;
+- set `closePreparation` to the new checkpoint path;
+- do not set `closedAt`;
+- do not set `closeout`.
 
-It should contain:
+Do not write or rewrite `close-session.md`.
 
-- current phase;
-- major completed work;
-- current governed work;
-- pending Human decisions;
-- known deferred work;
-- exact next step;
-- reference to the latest closeout.
+Do not perform the final `CURRENT.md` update.
 
-Do not copy the entire session history into CURRENT.
+Stop and wait for an explicit Human decision.
 
-## Sensitive information
+The next permitted lifecycle action is either:
 
-Never preserve secrets, credentials, API keys, private keys, or unapproved
-personal data.
-
-Redact sensitive evidence when necessary.
-
-## Final response
-
-Report:
-
-1. where the closeout was written;
-2. where CURRENT was updated;
-3. missing evidence;
-4. pending Human decisions;
-5. learning candidates requiring later review.
-
-Do not begin the next task.
+- cancellation of the prepared close; or
+- `/finalize-session`.

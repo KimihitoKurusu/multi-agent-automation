@@ -37,6 +37,10 @@ permissions:
   - action: skill
     resource: 'close-session'
     effect: allow
+
+  - action: skill
+    resource: 'finalize-session'
+    effect: allow
 ---
 
 You are the Architect of the Multi-Agent Automation Platform.

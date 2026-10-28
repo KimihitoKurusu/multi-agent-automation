@@ -22,6 +22,35 @@ Follow `docs/project-memory/README.md`.
 Operational memory does not override higher-authority project sources or
 current machine-verifiable repository evidence.
 
+## Establish the current session
+
+The latest historical session is not automatically the current session.
+
+New-format sessions use identifiers of the form:
+
+`session-YYYYMMDD-NNN`
+
+For a new working session:
+
+1. determine the current date token;
+2. inspect existing new-format session identifiers for that date;
+3. select the next numeric sequence;
+4. create a new session directory;
+5. create `SESSION.json` with state `OPEN`;
+6. record the observed Git HEAD as `baseHead`.
+
+Never reuse an existing session directory.
+
+Never adopt a session whose state is `CLOSED`.
+
+Never adopt a session that already contains `close-session.md`.
+
+Legacy session directories that do not use the new identifier format remain
+historical evidence. Do not rename or reuse them.
+
+The latest historical session and the current working session are different
+concepts.
+
 ## Read the minimum durable state
 
 Start with:
@@ -53,6 +82,17 @@ Do not claim a clean or synchronized repository without observing it.
 
 ## Detect contradictions
 
+A historical checkpoint or closeout may record an older branch or HEAD.
+
+That is expected historical evidence and is not a contradiction merely because
+the repository baseline later advanced.
+
+Compare a historical HEAD with the repository state that existed when the
+artifact was created.
+
+Compare only claims about current repository state directly against the
+currently observed Git state.
+
 Report contradictions explicitly.
 
 Examples:
@@ -64,6 +104,19 @@ Examples:
   authoritative evidence.
 
 Do not silently repair history.
+
+## Phase and milestone precision
+
+Do not infer completion of an entire phase from completion of one milestone.
+
+Distinguish:
+
+- completed milestones;
+- remaining milestones;
+- explicit Human phase-completion decisions.
+
+For example, completion of GOV-02.1 or GOV-02.2 does not by itself establish
+completion of Phase 4.
 
 ## Output
 

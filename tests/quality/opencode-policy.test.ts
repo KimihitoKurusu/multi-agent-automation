@@ -273,6 +273,89 @@ describe('OpenCode operational-memory skills', () => {
 
     expect(skills[skillId]?.description.trim()).not.toBe('');
   });
+
+  it('requires checkpoint to enforce the OPEN session boundary', () => {
+    const checkpoint = skills.checkpoint?.source ?? '';
+
+    expect(checkpoint).toContain('SESSION.json');
+    expect(checkpoint).toContain('state is `OPEN`');
+    expect(checkpoint).toContain(
+      'If the session is `CLOSE_PREPARED` or `CLOSED`, do not write a checkpoint.',
+    );
+    expect(checkpoint).toContain('Do not append checkpoints to a closed session.');
+  });
+
+  it('requires good-morning to allocate a new-format session', () => {
+    const goodMorning = skills['good-morning']?.source ?? '';
+
+    expect(goodMorning).toContain('session-YYYYMMDD-NNN');
+    expect(goodMorning).toContain(
+      'The latest historical session is not automatically the current session.',
+    );
+    expect(goodMorning).toContain('Never reuse an existing session directory.');
+    expect(goodMorning).toContain(
+      'Do not infer completion of an entire phase from completion of one milestone.',
+    );
+  });
+
+  it('requires good-morning to distinguish historical and current HEAD evidence', () => {
+    const goodMorning = skills['good-morning']?.source ?? '';
+
+    expect(goodMorning).toContain(
+      'A historical checkpoint or closeout may record an older branch or HEAD.',
+    );
+    expect(goodMorning).toContain(
+      'That is expected historical evidence and is not a contradiction',
+    );
+  });
+
+  it('requires close-session to prepare rather than finalize closure', () => {
+    const closeSession = skills['close-session']?.source ?? '';
+
+    expect(closeSession).toContain('CLOSE_PREPARED');
+    expect(closeSession).toContain('`finalize-session`');
+    expect(closeSession).toContain(
+      'Awaiting Human close decision. No close-session.md has been written.',
+    );
+    expect(closeSession).toContain('Do not write or rewrite `close-session.md`.');
+    expect(closeSession).toContain('Do not perform the final `CURRENT.md` update.');
+  });
+
+  it('requires close-session to avoid integration actions', () => {
+    const closeSession = skills['close-session']?.source ?? '';
+
+    expect(closeSession).toContain('Do not:');
+    expect(closeSession).toContain('- commit;');
+    expect(closeSession).toContain('- push;');
+    expect(closeSession).toContain('- open a pull request;');
+    expect(closeSession).toContain('- merge;');
+    expect(closeSession).toContain('- remove a worktree;');
+  });
+
+  it('requires finalize-session to enforce Human-confirmed finalization', () => {
+    const finalizeSession = skills['finalize-session']?.source ?? '';
+
+    expect(finalizeSession).toContain('CLOSE_PREPARED');
+    expect(finalizeSession).toContain(
+      'an explicit Human close decision was received after close preparation',
+    );
+    expect(finalizeSession).toContain(
+      'This workflow writes the immutable session closeout exactly once.',
+    );
+    expect(finalizeSession).toContain('After the session reaches `CLOSED`:');
+  });
+
+  it('requires finalize-session to preserve integration authority boundaries', () => {
+    const finalizeSession = skills['finalize-session']?.source ?? '';
+
+    expect(finalizeSession).toContain(
+      'Do not commit, push, open a pull request, merge, remove a worktree, or discard',
+    );
+    expect(finalizeSession).toContain(
+      '`ACCEPT_FOR_PROPOSAL` authorizes later proposal preparation only.',
+    );
+    expect(finalizeSession).toContain('It does not authorize governance implementation');
+  });
 });
 
 describe('OpenCode permission evaluation', () => {
@@ -371,6 +454,11 @@ describe('OpenCode permission evaluation', () => {
 describe('OpenCode governed baseline', () => {
   const config = readProjectConfig();
   const agents = readProjectAgents();
+  const expectedCommandViolation = `OpenCode commands must be exactly: ${[
+    ...OPERATIONAL_MEMORY_COMMAND_IDS,
+  ]
+    .sort()
+    .join(', ')}`;
 
   it('accepts the repository OpenCode baseline', () => {
     expect(validateOpenCodePolicy(config, agents)).toEqual([]);
@@ -566,9 +654,7 @@ describe('OpenCode governed baseline', () => {
       delete changed.commands['good-morning'];
     }
 
-    expect(validateOpenCodePolicy(changed, agents)).toContain(
-      'OpenCode commands must be exactly: checkpoint, close-session, dev-written-handoff, good-morning, leader-written-handoff, researcher-written-handoff',
-    );
+    expect(validateOpenCodePolicy(changed, agents)).toContain(expectedCommandViolation);
   });
   it('rejects an unexpected OpenCode command', () => {
     const changed = cloneConfig(config);
@@ -582,7 +668,7 @@ describe('OpenCode governed baseline', () => {
     };
 
     expect(validateOpenCodePolicy(changed, agents)).toContain(
-      'OpenCode commands must be exactly: checkpoint, close-session, dev-written-handoff, good-morning, leader-written-handoff, researcher-written-handoff',
+      `OpenCode commands must be exactly: ${[...OPERATIONAL_MEMORY_COMMAND_IDS].sort().join(', ')}`,
     );
   });
 

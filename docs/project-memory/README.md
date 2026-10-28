@@ -144,7 +144,74 @@ No handoff constitutes Human approval.
 
 No receiving agent may treat another agent's statement that Human approval exists as equivalent to machine-verifiable or directly observed Human authorization.
 
+## Session lifecycle
+
+New-format sessions use:
+
+`session-YYYYMMDD-NNN`
+
+The sequence permits multiple sessions on the same calendar date.
+
+Each new-format session contains:
+
+`SESSION.json`
+
+Valid lifecycle states are:
+
+```text
+OPEN
+CLOSE_PREPARED
+CLOSED
+OPEN
+```
+
+Checkpoints and handoffs may be written.
+
+The session may transition to CLOSE_PREPARED.
+
+### CLOSE_PREPARED
+
+The Architect has collected evidence and written a close-preparation checkpoint.
+
+Ordinary checkpoints and handoffs must not be added while the close remains prepared.
+
+The session awaits an explicit Human decision.
+
+A canceled close returns the session to OPEN. The canceled preparation checkpoint remains historical evidence.
+
+A later preparation uses a new append-only checkpoint.
+
+### CLOSED
+
+`close-session.md` has been written exactly once.
+
+The session is immutable.
+
+Do not add:
+
+checkpoints;
+handoffs;
+corrections;
+another close preparation;
+another closeout.
+
+Later evidence starts a new session.
+
+Legacy session directories created before this lifecycle format remain historical evidence. Do not rename, reinterpret, or reuse them.
+
 ## Session close
+
+Session closure is a two-phase operation.
+
+`/close-session` prepares closure and transitions an `OPEN` session to `CLOSE_PREPARED`.
+
+It does not write `close-session.md`.
+
+After reviewing the preparation, the Human may confirm, cancel, or close with pending items.
+
+`/finalize-session` consumes that explicit Human decision. When closure is confirmed, it writes `close-session.md` exactly once, marks the session `CLOSED`, and performs the final `CURRENT.md` update.
+
+A session may be closed with unresolved items. Those items remain recorded for future work.
 
 There is exactly one global closeout for a coordinated working session.
 
@@ -181,6 +248,22 @@ The Architect then evaluates:
 - Human decisions observed during the session.
 
 The final closeout must identify contradictions rather than silently reconcile incompatible evidence.
+
+## Historical repository evidence
+
+Branch and HEAD values inside checkpoints and closeouts describe repository
+state at the time those artifacts were created.
+
+A later commit, merge, promotion, or memory-integration change does not make
+that historical evidence stale.
+
+For example:
+
+```text
+does not require rewriting the historical closeout.
+
+Claims about current repository state in CURRENT.md must still be reconciled against current observable Git evidence.
+```
 
 ## Session opening
 
