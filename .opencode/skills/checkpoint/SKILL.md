@@ -24,6 +24,25 @@ Write only inside the current actor's session namespace.
 
 Do not modify an existing checkpoint after it has been published.
 
+## Session lifecycle precondition
+
+Before writing a checkpoint:
+
+1. identify the current session;
+2. read its `SESSION.json`;
+3. verify that the session state is `OPEN`;
+4. verify that `close-session.md` does not exist.
+
+If the session is `CLOSE_PREPARED` or `CLOSED`, do not write a checkpoint.
+
+If no valid current `OPEN` session exists, stop and request establishment of a
+new session.
+
+Never adopt the latest historical session identifier merely because it is the
+most recent directory.
+
+A session containing `close-session.md` is historical and immutable.
+
 ## Determine the target
 
 Use the current session identifier and actor identity supplied by the active
@@ -152,3 +171,10 @@ Never store secrets, authentication credentials, private keys, API keys, or
 unapproved personal data.
 
 Reference sensitive evidence without copying its sensitive value.
+
+## Historical immutability
+
+Do not append checkpoints to a closed session.
+
+Human corrections received after closure belong to a newly allocated session,
+not to the closed session.

@@ -132,6 +132,7 @@ export const OPERATIONAL_MEMORY_COMMAND_IDS = [
   'checkpoint',
   'close-session',
   'dev-written-handoff',
+  'finalize-session',
   'good-morning',
   'leader-written-handoff',
   'researcher-written-handoff',
@@ -141,6 +142,7 @@ export const OPERATIONAL_MEMORY_SKILL_IDS = [
   'checkpoint',
   'close-session',
   'dev-written-handoff',
+  'finalize-session',
   'good-morning',
   'leader-written-handoff',
   'researcher-written-handoff',
@@ -152,6 +154,7 @@ const EXPECTED_COMMAND_AGENTS: Record<
 > = {
   checkpoint: undefined,
   'close-session': 'architect',
+  'finalize-session': 'architect',
   'dev-written-handoff': 'developer',
   'good-morning': 'architect',
   'leader-written-handoff': 'team-leader',
@@ -159,7 +162,7 @@ const EXPECTED_COMMAND_AGENTS: Record<
 };
 
 const EXPECTED_SKILL_ACCESS: Record<GovernedAgentId, ReadonlySet<string>> = {
-  architect: new Set(['checkpoint', 'close-session', 'good-morning']),
+  architect: new Set(['checkpoint', 'close-session', 'good-morning', 'finalize-session']),
   developer: new Set(['checkpoint', 'dev-written-handoff']),
   researcher: new Set(['checkpoint', 'researcher-written-handoff']),
   'team-leader': new Set(['checkpoint', 'leader-written-handoff']),
